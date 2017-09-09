@@ -1,3 +1,6 @@
+// WoW Addon Updater by Lukas Joeressen
+// Licensed under CC0 - https://creativecommons.org/CC0
+
 use std::io::{Read, Seek};
 use std::path::{Path, PathBuf, Component};
 use std::fmt::Display;
