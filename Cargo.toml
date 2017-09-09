@@ -1,0 +1,13 @@
+[package]
+name = "addons"
+version = "0.1.0"
+authors = ["Lukas Joeressen <lukas@joeressen.net>"]
+
+[dependencies]
+reqwest = "0.7.3"
+serde = "1.0"
+serde_json = "1.0"
+serde_derive = "1.0"
+regex = "0.2"
+zip = "*"
+s_app_dir = "0.0.0"
