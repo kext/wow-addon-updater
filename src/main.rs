@@ -152,6 +152,16 @@ impl Addons {
     }
     return false;
   }
+
+  fn check_folder(&self) {
+    if &self.addon_folder == "" {
+      println!("\x1b[31;1mYou have to set your addons folder.\x1b[0m");
+      std::process::exit(1);
+    } else if !Path::new(&self.addon_folder).is_dir() {
+      println!("\x1b[31;1mYour addons folder is not a directory.\x1b[0m");
+      std::process::exit(1);
+    }
+  }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -194,11 +204,20 @@ fn discover_addon_folder() -> String {
   String::from("")
 }
 
+fn save_addons(addons: &Addons) {
+  let cfg = config_path();
+  std::fs::create_dir_all(Path::new(&cfg).parent().unwrap()).unwrap();
+  let mut file = std::fs::File::create(&cfg).unwrap();
+  serde_json::to_writer_pretty(&mut file, addons).unwrap();
+}
+
 fn addons_default() -> Addons {
-  Addons {
+  let addons = Addons {
     addon_folder: discover_addon_folder(),
     addons: Vec::new(),
-  }
+  };
+  save_addons(&addons);
+  addons
 }
 
 fn load_addons() -> Addons {
@@ -209,13 +228,6 @@ fn load_addons() -> Addons {
     },
     Err(_) => addons_default(),
   }
-}
-
-fn save_addons(addons: &Addons) {
-  let cfg = config_path();
-  std::fs::create_dir_all(Path::new(&cfg).parent().unwrap()).unwrap();
-  let mut file = std::fs::File::create(&cfg).unwrap();
-  serde_json::to_writer_pretty(&mut file, addons).unwrap();
 }
 
 fn update_addons(addons: &mut Addons) {
@@ -298,6 +310,7 @@ fn main() {
     help();
   } else if args[1] == "install" {
     let mut addons = load_addons();
+    addons.check_folder();
     let client = reqwest::Client::new().unwrap();
     for url in &args[2..] {
       let mut addon = Addon::new(url);
@@ -310,6 +323,7 @@ fn main() {
     save_addons(&addons);
   } else if args[1] == "update" {
     let mut addons = load_addons();
+    addons.check_folder();
     update_addons(&mut addons);
     save_addons(&addons);
   } else {
