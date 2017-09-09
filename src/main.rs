@@ -143,6 +143,17 @@ struct Addons {
   addons: Vec<Addon>,
 }
 
+impl Addons {
+  fn is_installed(&self, url: &str) -> bool {
+    for addon in &self.addons {
+      if url == &addon.url {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
 #[derive(Serialize, Deserialize)]
 struct Addon {
   url: String,
@@ -290,7 +301,9 @@ fn main() {
     let client = reqwest::Client::new().unwrap();
     for url in &args[2..] {
       let mut addon = Addon::new(url);
-      if install_new(&mut addon, &addons.addon_folder, &client) {
+      if addons.is_installed(url) {
+        println!("{} is already installed.", url);
+      } else if install_new(&mut addon, &addons.addon_folder, &client) {
         addons.addons.push(addon);
       }
     }
