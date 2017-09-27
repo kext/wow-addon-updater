@@ -46,10 +46,13 @@ fn get_string(url: &str, client: &reqwest::Client) -> Result<String, String> {
 fn get_curse_version(url: &str, client: &reqwest::Client) -> Result<String, String> {
   let data = get_string(url, client)?;
   let re = regex::Regex::new("<li class=\"newest-file\">Newest File: ([^<]+)</li>").unwrap();
-  match re.captures(&data) {
-    Some(version) => Ok(version[1].to_string()),
-    None => Err(String::from("Could not get version.")),
+  let version = re.captures(&data);
+  let re = regex::Regex::new("data-epoch=\"([0-9]+)\"").unwrap();
+  let date = re.captures(&data);
+  if version.is_none() || date.is_none() {
+    return Err(String::from("Could not get version."));
   }
+  Ok(format!("{} ({})", version.unwrap()[1].to_string(), date.unwrap()[1].to_string()))
 }
 
 /// Download an addon hosted on Curse.
