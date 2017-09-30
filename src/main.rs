@@ -52,7 +52,8 @@ fn get_curse_version(url: &str, client: &reqwest::Client) -> Result<String, Stri
   if version.is_none() || date.is_none() {
     return Err(String::from("Could not get version."));
   }
-  Ok(format!("{} ({})", version.unwrap()[1].to_string(), date.unwrap()[1].to_string()))
+  //Ok(format!("{} ({})", version.unwrap()[1].to_string(), date.unwrap()[1].to_string()))
+  Ok(format!("{}", version.unwrap()[1].to_string()))
 }
 
 /// Download an addon hosted on Curse.
