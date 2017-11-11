@@ -13,7 +13,7 @@ $ cargo install --git https://github.com/kext/wow-addon-updater
 Installing a new Addon:
 
 ```text
-$ addons install https://mods.curse.com/addons/wow/deadly-boss-mods
+$ addons install https://www.curseforge.com/wow/addons/deadly-boss-mods
 ```
 
 Updating your Addons:
