@@ -45,28 +45,27 @@ fn get_string(url: &str, client: &reqwest::Client) -> Result<String, String> {
 /// Get the version of an addon hosted on Curse.
 fn get_curse_version(url: &str, client: &reqwest::Client) -> Result<String, String> {
   let data = get_string(url, client)?;
-  let re = regex::Regex::new("<li class=\"newest-file\">Newest File: ([^<]+)</li>").unwrap();
-  let version = re.captures(&data);
   let re = regex::Regex::new("data-epoch=\"([0-9]+)\"").unwrap();
   let date = re.captures(&data);
-  if version.is_none() || date.is_none() {
+  if date.is_none() {
     return Err(String::from("Could not get version."));
   }
   //Ok(format!("{} ({})", version.unwrap()[1].to_string(), date.unwrap()[1].to_string()))
-  Ok(format!("{}", version.unwrap()[1].to_string()))
+  Ok(format!("{}", date.unwrap()[1].to_string()))
 }
 
 /// Download an addon hosted on Curse.
 fn get_curse_download(url: &str, client: &reqwest::Client) -> Result<Vec<u8>, String> {
   let url = format!("{}/download", url);
   let data = get_string(&url, client)?;
-  let re = regex::Regex::new("data-href=\"([^\"]+)\"").unwrap();
+  let re = regex::Regex::new("class=\"download__link\" href=\"([^\"]+)\"").unwrap();
   let url = match re.captures(&data) {
     Some(url) => url[1].to_string(),
     None => {
       return Err(String::from("Could not get download link."));
     },
   };
+  let url = format!("https://www.curseforge.com{}", url);
   get_data(&url, client)
 }
 
@@ -251,17 +250,17 @@ fn update_addons(addons: &mut Addons) {
                   addon.installed = Some(version);
                 },
                 Err(error) => {
-                  println!("\x1b[31;1m{}\x1b[0m", error);
+                  println!("\x1b[31;1mFailed to install {}: {}\x1b[0m", &addon.url, error);
                 },
               }
             },
             Err(error) => {
-              println!("\x1b[31;1m{}\x1b[0m", error);
+              println!("\x1b[31;1mFailed to download {}: {}\x1b[0m", &addon.url, error);
             },
           }
         }
       },
-      Err(error) => println!("\x1b[31;1m{}\x1b[0m", error),
+      Err(error) => println!("\x1b[31;1mFailed to get version {}: {}\x1b[0m", &addon.url, error),
     }
   }
 }

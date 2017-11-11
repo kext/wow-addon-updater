@@ -1,6 +1,6 @@
 [package]
 name = "addons"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Lukas Joeressen <lukas@joeressen.net>"]
 
 [dependencies]
